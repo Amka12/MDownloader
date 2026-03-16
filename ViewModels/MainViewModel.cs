@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -45,4 +46,7 @@ public partial class MainViewModel:ObservableObject
             _fileService.RefreshFiles();
         }
     }
+
+    [RelayCommand]
+    private void RefreshList() => _fileService.RefreshFiles();
 }

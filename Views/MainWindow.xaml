@@ -52,7 +52,8 @@
                 <Button Content="📂 Открыть папку" Command="{Binding OpenFolderCommand}" />
                 <Separator Width="1" Background="#555" Margin="10,5" />
                 <TextBlock Text="Текущая папка:" VerticalAlignment="Center" Foreground="#AAA" />
-                <TextBlock x:Name="LblFolderPath" Text="{Binding FolderPath}" VerticalAlignment="Center" Margin="5,0,0,0"
+                <TextBlock x:Name="LblFolderPath" Text="{Binding FolderPath}" VerticalAlignment="Center"
+                           Margin="5,0,0,0"
                            Foreground="#007ACC" />
             </StackPanel>
         </Border>
@@ -129,8 +130,8 @@
                 <!-- Заголовок списка -->
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,5">
                     <TextBlock Text="📁 Файлы в папке" FontWeight="Bold" VerticalAlignment="Center" />
-                    <Button Content="⟳ Обновить" Padding="5,2" FontSize="10" Margin="10,0,0,0" />
-                    <!--Click="BtnRefreshList_Click"/>-->
+                    <Button Content="⟳ Обновить" Padding="5,2" FontSize="10" Margin="10,0,0,0"
+                            Command="{Binding RefreshListCommand}" />
                 </StackPanel>
 
                 <!-- Список файлов -->
@@ -145,41 +146,41 @@
                     <!--MouseDoubleClick="LvFileList_MouseDoubleClick">-->
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem">
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Foreground" Value="White"/>
-                            <Setter Property="Padding" Value="8,5"/>
-                            <Setter Property="Margin" Value="2,1"/>
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Padding" Value="8,5" />
+                            <Setter Property="Margin" Value="2,1" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListViewItem">
-                                        <Border x:Name="Bd" 
-                                                Background="{TemplateBinding Background}" 
+                                        <Border x:Name="Bd"
+                                                Background="{TemplateBinding Background}"
                                                 Padding="{TemplateBinding Padding}"
                                                 Margin="{TemplateBinding Margin}"
                                                 CornerRadius="3"
                                                 BorderBrush="Transparent"
                                                 BorderThickness="0">
-                                            <GridViewRowPresenter 
+                                            <GridViewRowPresenter
                                                 Content="{TemplateBinding Content}"
-                                                Columns="{TemplateBinding GridView.ColumnCollection}"/>
+                                                Columns="{TemplateBinding GridView.ColumnCollection}" />
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#007ACC"/>
-                                                <Setter Property="Foreground" Value="White"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="#007ACC" />
+                                                <Setter Property="Foreground" Value="White" />
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#2D2D30"/>
+                                                <Setter TargetName="Bd" Property="Background" Value="#2D2D30" />
                                             </Trigger>
                                             <!-- Анимация при выделении -->
                                             <EventTrigger RoutedEvent="Selected">
                                                 <BeginStoryboard>
                                                     <Storyboard>
-                                                        <ColorAnimation 
+                                                        <ColorAnimation
                                                             Storyboard.TargetName="Bd"
                                                             Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                            To="#007ACC" 
-                                                            Duration="0:0:0.2"/>
+                                                            To="#007ACC"
+                                                            Duration="0:0:0.2" />
                                                     </Storyboard>
                                                 </BeginStoryboard>
                                             </EventTrigger>
