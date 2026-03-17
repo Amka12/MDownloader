@@ -22,4 +22,11 @@ public partial class App : Application
         var mainWindow = Services.GetRequiredService<MainWindow>();
         mainWindow.Show();
     }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        if (Services.GetService<MainViewModel>() is MainViewModel vm) vm.Dispose();
+        //Services.Dispose();
+        base.OnExit(e);
+    }
 }
