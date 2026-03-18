@@ -14,23 +14,24 @@ namespace MDownloader.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFileService _fileService;
-    [ObservableProperty] private double _currentPosition;
-    [ObservableProperty] private string _currentTime = "00:00";
+    private bool _isUserDraggingSlider;
 
     [ObservableProperty] private string _currentVideoPath = string.Empty;
     [ObservableProperty] private double _duration;
     [ObservableProperty] private string _folderPath = "Не выбрана";
-    [ObservableProperty] private bool _isMuted;
-    [ObservableProperty] private bool _isPaused;
-    [ObservableProperty] private bool _isPlaying;
+    [ObservableProperty] private VideoFile? _selectedVideo;
 
     private readonly LibVLC? _libVlc;
 
     //Player statements
     [ObservableProperty] private MediaPlayer? _mediaPlayer;
-    [ObservableProperty] private VideoFile? _selectedVideo;
+    [ObservableProperty] private bool _isMuted;
+    [ObservableProperty] private bool _isPaused;
+    [ObservableProperty] private bool _isPlaying;
     [ObservableProperty] private string _totalTime = "00:00";
     [ObservableProperty] private double _volume = 50;
+    [ObservableProperty] private string _currentTime = "00:00";
+    [ObservableProperty] private double _currentPosition;
     private DispatcherTimer? _progressTimer;
 
     public MainViewModel(IFileService fileService)
@@ -85,7 +86,7 @@ public partial class MainViewModel : ObservableObject
 
     private void UpdateProgress()
     {
-        if (MediaPlayer != null && IsPlaying)
+        if (MediaPlayer != null && IsPlaying && !_isUserDraggingSlider)
         {
             CurrentPosition = MediaPlayer.Time / 1000.0;
             CurrentTime = FormatTime(TimeSpan.FromMilliseconds(MediaPlayer.Time));
@@ -149,11 +150,6 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    //[RelayCommand(CanExecute = nameof(CanPlayVideo))]
-    //private void PlaySelectedVideo() => PlayVideo(SelectedVideo);
-
-    //private bool CanPlayVideo() => SelectedVideo != null;
-
     [RelayCommand]
     private void Play()
     {
@@ -193,10 +189,8 @@ public partial class MainViewModel : ObservableObject
         MediaPlayer?.Time = (long)(position * 1000);
     }
 
-    public void SetMediaPlayer(MediaPlayer mediaPlayer)
-    {
-        MediaPlayer = mediaPlayer;
-    }
+    [RelayCommand]
+    public void SetDragging(string isDragging) => _isUserDraggingSlider = Convert.ToBoolean(isDragging);
 
     // Очистка ресурсов
     public void Dispose()

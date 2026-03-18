@@ -117,9 +117,13 @@
                                         Background="#555"
                                         Foreground="#007ACC">
                                     <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                            <i:InvokeCommandAction Command="{Binding SetDraggingCommand}" CommandParameter="True"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                            <i:InvokeCommandAction Command="{Binding SetDraggingCommand}" CommandParameter="False"/>
                                             <i:InvokeCommandAction Command="{Binding SeekCommand}"
-                                                                   CommandParameter="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}" />
+                                                                   CommandParameter="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"/>
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Slider>
