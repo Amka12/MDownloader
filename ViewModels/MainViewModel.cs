@@ -7,6 +7,7 @@ using LibVLCSharp.Shared;
 using MDownloader.Models;
 using MDownloader.Services;
 using Microsoft.Win32;
+
 //using System.Windows;
 
 namespace MDownloader.ViewModels;
@@ -14,29 +15,42 @@ namespace MDownloader.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFileService _fileService;
-    private bool _isUserDraggingSlider;
-
-    [ObservableProperty] private string _currentVideoPath = string.Empty;
-    [ObservableProperty] private double _duration;
-    [ObservableProperty] private string _folderPath = "Не выбрана";
-    [ObservableProperty] private VideoFile? _selectedVideo;
 
     private readonly LibVLC? _libVlc;
+    private readonly IYouTubeService _youtubeService;
+
+    [ObservableProperty] private string _currentVideoPath = string.Empty;
+    [ObservableProperty] private int _downloadProgress;
+    [ObservableProperty] private string _downloadStatus = "Ожидание...";
+    [ObservableProperty] private string _folderPath = "Не выбрана";
+    [ObservableProperty] private bool _isDownloading;
+    [ObservableProperty] private string _youtubeUrl = string.Empty;
+    [ObservableProperty] private VideoFile? _selectedVideo;
+    [ObservableProperty] private string _selectedQuality = "720p";
+
+    public List<string> QualityOptions { get; } = new()
+    {
+        "1080p", "720p", "Audio Only"
+    };
+
+    private bool _isUserDraggingSlider;
+    private DispatcherTimer? _progressTimer;
 
     //Player statements
     [ObservableProperty] private MediaPlayer? _mediaPlayer;
+    [ObservableProperty] private double _currentPosition;
+    [ObservableProperty] private string _currentTime = "00:00";
+    [ObservableProperty] private double _duration;
     [ObservableProperty] private bool _isMuted;
     [ObservableProperty] private bool _isPaused;
     [ObservableProperty] private bool _isPlaying;
     [ObservableProperty] private string _totalTime = "00:00";
     [ObservableProperty] private double _volume = 50;
-    [ObservableProperty] private string _currentTime = "00:00";
-    [ObservableProperty] private double _currentPosition;
-    private DispatcherTimer? _progressTimer;
 
-    public MainViewModel(IFileService fileService)
+    public MainViewModel(IFileService fileService, IYouTubeService youtubeService)
     {
         _fileService = fileService;
+        _youtubeService = youtubeService;
         _fileService.FilesChanged += OnFilesChanged;
         Core.Initialize();
         _libVlc = new LibVLC();
@@ -190,7 +204,45 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void SetDragging(string isDragging) => _isUserDraggingSlider = Convert.ToBoolean(isDragging);
+    public void SetDragging(string isDragging)
+    {
+        _isUserDraggingSlider = Convert.ToBoolean(isDragging);
+    }
+
+    [RelayCommand]
+    private async Task DownloadAsync()
+    {
+        if (string.IsNullOrWhiteSpace(YoutubeUrl) || string.IsNullOrEmpty(_fileService.SelectedFolderPath))
+        {
+            MessageBox.Show("Укажите ссылку и выберите папку!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        IsDownloading = true;
+        DownloadStatus = "Подготовка...";
+        DownloadProgress = 0;
+
+        var progress = new Progress<double>(p =>
+        {
+            DownloadProgress = (int)(p * 100);
+            DownloadStatus = $"Загрузка: {DownloadProgress}%";
+        });
+
+        var result = await _youtubeService.DownloadVideoAsync(YoutubeUrl, SelectedQuality, _fileService.SelectedFolderPath, progress);
+
+        if (result.Success)
+        {
+            DownloadStatus = "Загрузка завершена!";
+            _fileService.RefreshFiles();
+            YoutubeUrl = string.Empty;
+        }
+        else
+        {
+            DownloadStatus = $"Ошибка: {result.Error}";
+        }
+
+        IsDownloading = false;
+    }
 
     // Очистка ресурсов
     public void Dispose()

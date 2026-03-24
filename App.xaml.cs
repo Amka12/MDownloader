@@ -15,6 +15,7 @@ public partial class App : Application
 
         var collection = new ServiceCollection();
         collection.AddSingleton<IFileService, FileService>();
+        collection.AddSingleton<IYouTubeService, YouTubeService>();
         collection.AddSingleton<MainViewModel>();
         collection.AddTransient<MainWindow>();
 
