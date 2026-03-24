@@ -18,34 +18,29 @@ public partial class MainViewModel : ObservableObject
 
     private readonly LibVLC? _libVlc;
     private readonly IYouTubeService _youtubeService;
+    [ObservableProperty] private double _currentPosition;
+    [ObservableProperty] private string _currentTime = "00:00";
 
     [ObservableProperty] private string _currentVideoPath = string.Empty;
     [ObservableProperty] private int _downloadProgress;
     [ObservableProperty] private string _downloadStatus = "Ожидание...";
+    [ObservableProperty] private double _duration;
     [ObservableProperty] private string _folderPath = "Не выбрана";
     [ObservableProperty] private bool _isDownloading;
-    [ObservableProperty] private string _youtubeUrl = string.Empty;
-    [ObservableProperty] private VideoFile? _selectedVideo;
-    [ObservableProperty] private string _selectedQuality = "720p";
-
-    public List<string> QualityOptions { get; } = new()
-    {
-        "1080p", "720p", "Audio Only"
-    };
-
-    private bool _isUserDraggingSlider;
-    private DispatcherTimer? _progressTimer;
-
-    //Player statements
-    [ObservableProperty] private MediaPlayer? _mediaPlayer;
-    [ObservableProperty] private double _currentPosition;
-    [ObservableProperty] private string _currentTime = "00:00";
-    [ObservableProperty] private double _duration;
     [ObservableProperty] private bool _isMuted;
     [ObservableProperty] private bool _isPaused;
     [ObservableProperty] private bool _isPlaying;
+
+    private bool _isUserDraggingSlider;
+
+    //Player statements
+    [ObservableProperty] private MediaPlayer? _mediaPlayer;
+    private DispatcherTimer? _progressTimer;
+    [ObservableProperty] private string _selectedQuality = "1080p";
+    [ObservableProperty] private VideoFile? _selectedVideo;
     [ObservableProperty] private string _totalTime = "00:00";
     [ObservableProperty] private double _volume = 50;
+    [ObservableProperty] private string _youtubeUrl = string.Empty;
 
     public MainViewModel(IFileService fileService, IYouTubeService youtubeService)
     {
@@ -57,6 +52,11 @@ public partial class MainViewModel : ObservableObject
         MediaPlayer = new MediaPlayer(_libVlc);
         InitializePlayer(MediaPlayer);
     }
+
+    public List<string> QualityOptions { get; } = new()
+    {
+        "1080p", "720p" /*, "Audio Only"*/
+    };
 
     public ObservableCollection<VideoFile> VideoFiles { get; } = new();
 
@@ -243,6 +243,7 @@ public partial class MainViewModel : ObservableObject
 
         IsDownloading = false;
     }
+
 
     // Очистка ресурсов
     public void Dispose()
