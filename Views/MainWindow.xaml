@@ -3,9 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:wpf="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
-        xmlns:helpers="clr-namespace:MDownloader.Helpers"
         Title="Mega Downloader"
-        Height="800" Width="1200"
+        Height="1080" Width="1920"
         Background="#1E1E1E"
         Foreground="White"
         FontFamily="Segoe UI">
@@ -80,7 +79,10 @@
 
                     <!-- VideoView от LibVLCSharp -->
                     <wpf:VideoView x:Name="VideoPlayerControl"
-                                   helpers:MediaPlayerHelper.MediaPlayer="{Binding MediaPlayer}"/>
+                                   Grid.Row="0"
+                                   MediaPlayer="{Binding MediaPlayer}"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"/>
 
                     <!-- Панель управления -->
                     <Border Grid.Row="1" Background="#252526" Padding="15,10"

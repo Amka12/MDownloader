@@ -1,12 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LibVLCSharp.Shared;
 using MDownloader.Models;
 using MDownloader.Services;
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Threading;
 
 //using System.Windows;
 
@@ -15,12 +16,14 @@ namespace MDownloader.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFileService _fileService;
+    private readonly IYouTubeService _youtubeService;
 
     private readonly LibVLC? _libVlc;
-    private readonly IYouTubeService _youtubeService;
+    private bool _isUserDraggingSlider;
+    private DispatcherTimer? _progressTimer;
+
     [ObservableProperty] private double _currentPosition;
     [ObservableProperty] private string _currentTime = "00:00";
-
     [ObservableProperty] private string _currentVideoPath = string.Empty;
     [ObservableProperty] private int _downloadProgress;
     [ObservableProperty] private string _downloadStatus = "Ожидание...";
@@ -31,11 +34,8 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _isPaused;
     [ObservableProperty] private bool _isPlaying;
 
-    private bool _isUserDraggingSlider;
-
     //Player statements
     [ObservableProperty] private MediaPlayer? _mediaPlayer;
-    private DispatcherTimer? _progressTimer;
     [ObservableProperty] private string _selectedQuality = "1080p";
     [ObservableProperty] private VideoFile? _selectedVideo;
     [ObservableProperty] private string _totalTime = "00:00";
@@ -47,9 +47,10 @@ public partial class MainViewModel : ObservableObject
         _fileService = fileService;
         _youtubeService = youtubeService;
         _fileService.FilesChanged += OnFilesChanged;
-        Core.Initialize();
-        _libVlc = new LibVLC();
+        //Core.Initialize();
+        _libVlc = new LibVLC("--verbose=2");
         MediaPlayer = new MediaPlayer(_libVlc);
+        MediaPlayer.EnableHardwareDecoding = true;
         InitializePlayer(MediaPlayer);
     }
 
@@ -152,13 +153,34 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void PlayVideo(VideoFile? file)
+    private async void PlayVideo(VideoFile? file)
     {
         var targetFile = file ?? SelectedVideo;
         if (targetFile != null && MediaPlayer != null)
         {
             CurrentVideoPath = targetFile.FullPath;
             var media = new Media(_libVlc, CurrentVideoPath);
+
+            await media.Parse(MediaParseOptions.ParseLocal);
+            foreach (var track in media.Tracks)
+            {
+                switch (track.TrackType)
+                {
+                    case TrackType.Audio:
+                        Debug.WriteLine("Audio track");
+                        Debug.WriteLine($"{nameof(track.Data.Audio.Channels)}: {track.Data.Audio.Channels}");
+                        Debug.WriteLine($"{nameof(track.Data.Audio.Rate)}: {track.Data.Audio.Rate}");
+                        break;
+                    case TrackType.Video:
+                        Debug.WriteLine("Video track");
+                        Debug.WriteLine($"{nameof(track.Data.Video.FrameRateNum)}: {track.Data.Video.FrameRateNum}");
+                        Debug.WriteLine($"{nameof(track.Data.Video.FrameRateDen)}: {track.Data.Video.FrameRateDen}");
+                        Debug.WriteLine($"{nameof(track.Data.Video.Height)}: {track.Data.Video.Height}");
+                        Debug.WriteLine($"{nameof(track.Data.Video.Width)}: {track.Data.Video.Width}");
+                        break;
+                }
+            }
+            
             MediaPlayer.Media = media;
             MediaPlayer.Play();
         }
@@ -243,8 +265,7 @@ public partial class MainViewModel : ObservableObject
 
         IsDownloading = false;
     }
-
-
+    
     // Очистка ресурсов
     public void Dispose()
     {

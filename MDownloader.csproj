@@ -12,6 +12,7 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Etherna.YoutubeDownloader" Version="6.5.7" />
     <PackageReference Include="Etherna.YoutubeDownloader.Converter" Version="6.5.7" />
+    <PackageReference Include="FFmpeg.AutoGen" Version="8.0.0.1" />
     <PackageReference Include="LibVLCSharp.WPF" Version="3.9.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
