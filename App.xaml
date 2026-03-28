@@ -36,5 +36,86 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <!-- Стиль для слайдера -->
+        <ControlTemplate x:Key="SliderThumb" TargetType="Thumb">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- Внешний круг -->
+                <Ellipse x:Name="ThumbEllipse"
+                         Width="16"
+                         Height="16"
+                         Fill="#007ACC"
+                         Stroke="White"
+                         StrokeThickness="2">
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="4" 
+                                          ShadowDepth="0" 
+                                          Opacity="0.3"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <!-- Внутренний круг -->
+                <Ellipse Width="8"
+                         Height="8"
+                         Fill="White"
+                         Opacity="0.5"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="ThumbEllipse" Property="Fill" Value="#0099FF"/>
+                    <Setter TargetName="ThumbEllipse" Property="Width" Value="18"/>
+                    <Setter TargetName="ThumbEllipse" Property="Height" Value="18"/>
+                </Trigger>
+                <Trigger Property="IsDragging" Value="True">
+                    <Setter TargetName="ThumbEllipse" Property="Fill" Value="#005A9E"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="Slider" x:Key="VideoSeekBar">
+            <Setter Property="Background" Value="#555555"/>
+            <Setter Property="Foreground" Value="#007ACC"/>
+            <Setter Property="IsMoveToPointEnabled" Value="True"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <!-- Track -->
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="{TemplateBinding Foreground}" 
+                                                CornerRadius="2"
+                                                Height="4"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="{TemplateBinding Foreground}" 
+                                                Opacity="0.3"
+                                                CornerRadius="2"
+                                                Height="4"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+
+                                <Track.Thumb>
+                                    <Thumb Template="{StaticResource SliderThumb}"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Application.Resources>
 </Application>

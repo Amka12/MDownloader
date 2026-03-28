@@ -109,7 +109,8 @@
                                            Margin="0,0,10,0"
                                            FontFamily="Consolas" />
 
-                                <Slider Grid.Column="1"
+                                <Slider Style="{StaticResource VideoSeekBar}"
+                                        Grid.Column="1"
                                         Minimum="0"
                                         Maximum="{Binding Duration}"
                                         Value="{Binding CurrentPosition, Mode=TwoWay}"
