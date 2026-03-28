@@ -115,8 +115,13 @@
                                         Value="{Binding CurrentPosition, Mode=TwoWay}"
                                         VerticalAlignment="Center"
                                         Background="#555"
-                                        Foreground="#007ACC">
+                                        Foreground="#007ACC"
+                                        IsMoveToPointEnabled="True">
                                     <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                                            <i:InvokeCommandAction Command="{Binding SeekCommand}"
+                                                                   CommandParameter="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"/>
+                                        </i:EventTrigger>
                                         <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
                                             <i:InvokeCommandAction Command="{Binding SetDraggingCommand}" CommandParameter="True"/>
                                         </i:EventTrigger>
