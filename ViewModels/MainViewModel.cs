@@ -48,10 +48,11 @@ public partial class MainViewModel : ObservableObject
         _youtubeService = youtubeService;
         _fileService.FilesChanged += OnFilesChanged;
         //Core.Initialize();
-        _libVlc = new LibVLC("--verbose=2");
+        _libVlc = new LibVLC();
         MediaPlayer = new MediaPlayer(_libVlc);
         MediaPlayer.EnableHardwareDecoding = true;
         InitializePlayer(MediaPlayer);
+        OnVolumeChanged(Volume);
     }
 
     public List<string> QualityOptions { get; } = new()
@@ -215,8 +216,10 @@ public partial class MainViewModel : ObservableObject
 
         if (MediaPlayer.IsPlaying)
             MediaPlayer.Pause();
-        else
+        else if (IsPaused)
             MediaPlayer.Play();
+        else
+            PlayVideo(SelectedVideo);
     }
 
     [RelayCommand]
