@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AngleSharp.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LibVLCSharp.Shared;
 using MDownloader.Models;
@@ -6,10 +7,9 @@ using MDownloader.Services;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Threading;
-
-//using System.Windows;
 
 namespace MDownloader.ViewModels;
 
@@ -42,12 +42,19 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _volume = 50;
     [ObservableProperty] private string _youtubeUrl = string.Empty;
 
+    // --- Свойства для информации о видео ---
+    [ObservableProperty] private string _audioInfo = string.Empty;
+    [ObservableProperty] private string _videoInfo = string.Empty;
+    [ObservableProperty] private string _videoCodec = string.Empty;
+    [ObservableProperty] private string _audioCodec = string.Empty;
+    [ObservableProperty] private bool _hasVideoInfo;
+
     public MainViewModel(IFileService fileService, IYouTubeService youtubeService)
     {
         _fileService = fileService;
         _youtubeService = youtubeService;
         _fileService.FilesChanged += OnFilesChanged;
-        //Core.Initialize();
+        Core.Initialize();
         _libVlc = new LibVLC();
         MediaPlayer = new MediaPlayer(_libVlc);
         MediaPlayer.EnableHardwareDecoding = true;
@@ -64,6 +71,12 @@ public partial class MainViewModel : ObservableObject
 
     public void InitializePlayer(MediaPlayer mediaPlayer)
     {
+        if (MediaPlayer == null) return;
+
+        MediaPlayer.MediaChanged += async (s, e) =>
+        {
+            await LoadMediaInfo();
+        };
         MediaPlayer.Playing += (s, e) =>
         {
             IsPlaying = true;
@@ -80,6 +93,7 @@ public partial class MainViewModel : ObservableObject
             IsPaused = false;
             CurrentPosition = 0;
             CurrentTime = "00:00";
+            HasVideoInfo = false;
         };
         MediaPlayer.EndReached += (s, e) =>
         {
@@ -100,6 +114,19 @@ public partial class MainViewModel : ObservableObject
         _progressTimer.Start();
     }
 
+    #region partialHandlers
+    partial void OnVolumeChanged(double value)
+    {
+        if (MediaPlayer != null) MediaPlayer.Volume = (int)Math.Max(0, Math.Min(100, value));
+    }
+
+    partial void OnIsMutedChanged(bool value)
+    {
+        if (MediaPlayer != null)
+            MediaPlayer.Mute = value;
+    }
+    #endregion
+
     private void UpdateProgress()
     {
         if (MediaPlayer != null && IsPlaying && !_isUserDraggingSlider)
@@ -114,15 +141,38 @@ public partial class MainViewModel : ObservableObject
         return $"{(int)time.TotalMinutes:00}:{time.Seconds:00}";
     }
 
-    partial void OnVolumeChanged(double value)
+    private async Task LoadMediaInfo()
     {
-        if (MediaPlayer != null) MediaPlayer.Volume = (int)Math.Max(0, Math.Min(100, value));
-    }
+        if (MediaPlayer == null || MediaPlayer.Media == null) return;
 
-    partial void OnIsMutedChanged(bool value)
-    {
-        if (MediaPlayer != null)
-            MediaPlayer.Mute = value;
+        await Application.Current.Dispatcher.InvokeAsync(async () =>
+        {
+            try
+            {
+                await MediaPlayer.Media.Parse();
+                foreach (var track in MediaPlayer.Media.Tracks)
+                {
+                    switch (track.TrackType)
+                    {
+                        case TrackType.Audio:
+                            AudioInfo = $"{track.Bitrate/1000} kbps, {track.Data.Audio.Channels}x{track.Data.Audio.Rate} Hz";
+                            AudioCodec= MediaPlayer.Media.CodecDescription(TrackType.Audio, track.Codec);
+                            break;
+                        case TrackType.Video:
+                            VideoInfo = $"{track.Data.Video.Width}x{track.Data.Video.Height} {track.Data.Video.FrameRateNum/track.Data.Video.FrameRateDen} к/с";
+                            VideoCodec = MediaPlayer.Media.CodecDescription(TrackType.Video, track.Codec);
+                            break;
+                    }
+                }
+
+                HasVideoInfo = true;
+            }
+            catch (Exception e)
+            {
+                VideoInfo = $"Ошибка: {e.Message}";
+                HasVideoInfo = false;
+            }
+        });
     }
 
     private void OnFilesChanged()
@@ -135,6 +185,7 @@ public partial class MainViewModel : ObservableObject
         });
     }
 
+    #region Commands
     [RelayCommand]
     private void OpenFolder()
     {
@@ -268,7 +319,9 @@ public partial class MainViewModel : ObservableObject
 
         IsDownloading = false;
     }
-    
+
+    #endregion
+
     // Очистка ресурсов
     public void Dispose()
     {
