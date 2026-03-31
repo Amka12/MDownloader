@@ -38,6 +38,53 @@
         </Style>
 
         <!-- Стиль для слайдера -->
+        <Style TargetType="Slider" x:Key="VideoSeekBar">
+            <Setter Property="Background" Value="#555555"/>
+            <Setter Property="Foreground" Value="#007ACC"/>
+            <Setter Property="IsMoveToPointEnabled" Value="True"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid>
+                            <!-- Track -->
+                            <Track x:Name="PART_Track" Cursor="Hand">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="{TemplateBinding Foreground}" 
+                                                CornerRadius="2"
+                                                Height="4"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Background="{TemplateBinding Foreground}" 
+                                                Opacity="0.3"
+                                                CornerRadius="2"
+                                                Height="6"/>
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.IncreaseRepeatButton>
+
+                                <Track.Thumb>
+                                    <Thumb Template="{StaticResource SliderThumb}"/>
+                                </Track.Thumb>
+
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <ControlTemplate x:Key="SliderThumb" TargetType="Thumb">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                 <!-- Внешний круг -->
@@ -71,51 +118,5 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
-
-        <Style TargetType="Slider" x:Key="VideoSeekBar">
-            <Setter Property="Background" Value="#555555"/>
-            <Setter Property="Foreground" Value="#007ACC"/>
-            <Setter Property="IsMoveToPointEnabled" Value="True"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Slider">
-                        <Grid>
-                            <!-- Track -->
-                            <Track x:Name="PART_Track">
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton Command="Slider.DecreaseLarge">
-                                        <RepeatButton.Template>
-                                            <ControlTemplate TargetType="RepeatButton">
-                                                <Border Background="{TemplateBinding Foreground}" 
-                                                CornerRadius="2"
-                                                Height="4"/>
-                                            </ControlTemplate>
-                                        </RepeatButton.Template>
-                                    </RepeatButton>
-                                </Track.DecreaseRepeatButton>
-
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton Command="Slider.IncreaseLarge">
-                                        <RepeatButton.Template>
-                                            <ControlTemplate TargetType="RepeatButton">
-                                                <Border Background="{TemplateBinding Foreground}" 
-                                                Opacity="0.3"
-                                                CornerRadius="2"
-                                                Height="4"/>
-                                            </ControlTemplate>
-                                        </RepeatButton.Template>
-                                    </RepeatButton>
-                                </Track.IncreaseRepeatButton>
-
-                                <Track.Thumb>
-                                    <Thumb Template="{StaticResource SliderThumb}"/>
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Application.Resources>
 </Application>
