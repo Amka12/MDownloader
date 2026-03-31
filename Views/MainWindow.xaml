@@ -235,7 +235,7 @@
                     <TextBlock Grid.Row="0" Text="Ютубная ссылка" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" />
 
                     <TextBlock Grid.Row="1" Text="Вставьте ссылку:" FontSize="12" Foreground="#AAA" />
-                    <TextBox Grid.Row="2" Height="30" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="{Binding YoutubeUrl}"/>
+                    <TextBox Grid.Row="2" Height="30" TextWrapping="NoWrap" Text="{Binding YoutubeUrl}"/>
 
                     <TextBlock Grid.Row="3" Text="Качество:" FontSize="12" Foreground="#AAA" />
                     <ComboBox Grid.Row="4" Margin="0,0,0,10" 
