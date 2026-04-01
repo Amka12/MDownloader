@@ -46,6 +46,37 @@ public class YouTubeService : IYouTubeService
         }
     }
 
+    public async Task<List<string>> GetAvailableQualitiesAsync(string url, CancellationToken ct = default)
+    {
+        try
+        {
+            var youtube = new YoutubeClient();
+            var streamManifest = await youtube.Videos.Streams.GetManifestAsync(url, ct);
+            var qualities = new List<string>();
+
+            var videoStreams = streamManifest.GetVideoStreams();
+            foreach (var stream in videoStreams)
+            {
+                var qualityLabel = $"{stream.VideoResolution.Height}p";
+                if (!qualities.Contains(qualityLabel))
+                    qualities.Add(qualityLabel);
+            }
+
+            if (streamManifest.GetAudioOnlyStreams().Any())
+                qualities.Add("Audio only");
+
+            return qualities
+                .Where(q => q != "Audio only")
+                .OrderByDescending(q => int.TryParse(q.Replace("p", ""), out var h) ? h : 0)
+                .Concat(qualities.Where(q => q == "Audio only"))
+                .ToList();
+        }
+        catch (Exception)
+        {
+            return new List<string> { "1080p", "720p", "360p", "Audio only" };
+        }
+    }
+
     private async Task<DownloadResult> DownloadWithMergeAsync(YoutubeClient youtube, Video video, StreamManifest streamManifest, string quality, string savePath, IProgress<double>? progress, CancellationToken ct)
     {
         // Выбираем видеопоток нужного качества
