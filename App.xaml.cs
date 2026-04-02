@@ -16,10 +16,12 @@ public partial class App : Application
         var collection = new ServiceCollection();
         collection.AddSingleton<IFileService, FileService>();
         collection.AddSingleton<IYouTubeService, YouTubeService>();
+        collection.AddSingleton<ISettingsService, SettingsService>();
         collection.AddSingleton<MainViewModel>();
         collection.AddTransient<MainWindow>();
 
         Services = collection.BuildServiceProvider();
+
         var mainWindow = Services.GetRequiredService<MainWindow>();
         mainWindow.Show();
     }

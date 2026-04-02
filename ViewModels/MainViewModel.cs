@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -14,57 +15,64 @@ namespace MDownloader.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IFileService _fileService;
+    private readonly IYouTubeService _youtubeService;
+    private readonly ISettingsService _settingsService;
 
     private readonly LibVLC? _libVlc;
-    private readonly IYouTubeService _youtubeService;
-    [ObservableProperty] private string _audioCodec = string.Empty;
-
-    // --- Свойства для информации о видео ---
-    [ObservableProperty] private string _audioInfo = string.Empty;
-
-    [ObservableProperty] private double _currentPosition;
-    [ObservableProperty] private string _currentTime = "00:00";
-    [ObservableProperty] private string _currentVideoPath = string.Empty;
-    [ObservableProperty] private int _downloadProgress;
-    [ObservableProperty] private string _downloadStatus = "Ожидание...";
-    [ObservableProperty] private double _duration;
-    [ObservableProperty] private string _folderPath = "Не выбрана";
-    [ObservableProperty] private bool _hasQualityOptions;
-    [ObservableProperty] private bool _hasVideoInfo;
-    [ObservableProperty] private bool _isDownloading;
-    [ObservableProperty] private bool _isMuted;
-    [ObservableProperty] private bool _isPaused;
-    [ObservableProperty] private bool _isPlaying;
-    [ObservableProperty] private bool _isQualityListLoading;
     private bool _isUserDraggingSlider;
-
-    //Player statements
-    [ObservableProperty] private MediaPlayer? _mediaPlayer;
     private DispatcherTimer? _progressTimer;
     private CancellationTokenSource? _qualityFetchCts;
-    [ObservableProperty] private string _selectedQuality = "1080p";
-    [ObservableProperty] private VideoFile? _selectedVideo;
-    [ObservableProperty] private string _totalTime = "00:00";
-    [ObservableProperty] private string _videoCodec = string.Empty;
-    [ObservableProperty] private string _videoInfo = string.Empty;
-    [ObservableProperty] private double _volume = 50;
-    [ObservableProperty] private string _youtubeUrl = string.Empty;
 
-    public MainViewModel(IFileService fileService, IYouTubeService youtubeService)
+    public ObservableCollection<VideoFile> VideoFiles { get; } = new();
+    public ObservableCollection<string> QualityOptions { get; } = new();
+    
+    // Youtube fields
+    [ObservableProperty] private string _youtubeUrl = string.Empty;
+    [ObservableProperty] private int _downloadProgress;
+    [ObservableProperty] private string _downloadStatus = "Ожидание...";
+    [ObservableProperty] private bool _isDownloading;
+    [ObservableProperty] private string _selectedQuality = "1080p";
+    
+    // --- Свойства для информации о видео ---
+    [ObservableProperty] private string _audioInfo = string.Empty;
+    [ObservableProperty] private string _audioCodec = string.Empty;
+    [ObservableProperty] private string _videoInfo = string.Empty;
+    [ObservableProperty] private string _videoCodec = string.Empty;
+    [ObservableProperty] private bool _hasQualityOptions;
+    [ObservableProperty] private bool _hasVideoInfo;
+    [ObservableProperty] private bool _isQualityListLoading;
+    
+    // View bindings
+    [ObservableProperty] private string _currentVideoPath = string.Empty;
+    [ObservableProperty] private string _folderPath = "Не выбрана";
+    [ObservableProperty] private VideoFile? _selectedVideo;
+    
+    //Player statements
+    [ObservableProperty] private MediaPlayer? _mediaPlayer;
+    [ObservableProperty] private bool _isPlaying;
+    [ObservableProperty] private bool _isPaused;
+    [ObservableProperty] private bool _isMuted;
+    [ObservableProperty] private double _duration;
+    [ObservableProperty] private string _currentTime = "00:00";
+    [ObservableProperty] private double _currentPosition;
+    [ObservableProperty] private string _totalTime = "00:00";
+    [ObservableProperty] private double _volume = 50;
+    
+    public MainViewModel(IFileService fileService, IYouTubeService youtubeService, ISettingsService settingsService)
     {
         _fileService = fileService;
         _youtubeService = youtubeService;
+        _settingsService = settingsService;
+
         _fileService.FilesChanged += OnFilesChanged;
         Core.Initialize();
         _libVlc = new LibVLC();
         MediaPlayer = new MediaPlayer(_libVlc);
         MediaPlayer.EnableHardwareDecoding = true;
         InitializePlayer(MediaPlayer);
-        OnVolumeChanged(Volume);
+        LoadSettings();
+        //OnVolumeChanged(Volume);
     }
-
-    public ObservableCollection<VideoFile> VideoFiles { get; } = new();
-    public ObservableCollection<string> QualityOptions { get; } = new();
 
     public void InitializePlayer(MediaPlayer mediaPlayer)
     {
@@ -213,9 +221,43 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private void LoadSettings()
+    {
+        var settings = _settingsService.LoadSettings();
+
+        if (!string.IsNullOrEmpty(settings.LastFolderPath))
+        {
+            if (Directory.Exists(settings.LastFolderPath))
+            {
+                _fileService.SelectedFolderPath = settings.LastFolderPath;
+                FolderPath = settings.LastFolderPath;
+                _fileService.RefreshFiles();
+            }
+            else
+            {
+                FolderPath = "Не выбрана";
+            }
+        }
+
+        Volume = settings.Volume;
+        IsMuted = settings.IsMuted;
+    }
+
+    public void SaveSettings()
+    {
+        var settings = new AppSettings
+        {
+            LastFolderPath = _fileService.SelectedFolderPath,
+            Volume = Volume,
+            IsMuted = IsMuted
+        };
+        _settingsService.SaveSettings(settings);
+    }
+
     // Очистка ресурсов
     public void Dispose()
     {
+        SaveSettings();
         _progressTimer?.Stop();
         MediaPlayer?.Dispose();
         _libVlc?.Dispose();
