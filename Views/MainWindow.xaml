@@ -4,7 +4,11 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:wpf="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
         Title="Качалка мочалка :)"
-        Height="1080" Width="1920"
+        Height="{Binding WindowHeight, Mode=TwoWay}"
+        Width="{Binding WindowWidth,Mode=TwoWay}"
+        Left="{Binding WindowLeft,Mode=TwoWay}"
+        Top="{Binding WindowTop,Mode=TwoWay}"
+        WindowState="{Binding WindowState, Mode=TwoWay}"
         Background="#1E1E1E"
         Foreground="White"
         FontFamily="Segoe UI">

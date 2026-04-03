@@ -1,14 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LibVLCSharp.Shared;
 using MDownloader.Models;
 using MDownloader.Services;
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace MDownloader.ViewModels;
 
@@ -46,6 +46,11 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _currentVideoPath = string.Empty;
     [ObservableProperty] private string _folderPath = "Не выбрана";
     [ObservableProperty] private VideoFile? _selectedVideo;
+    [ObservableProperty] private double _windowHeight = 800;
+    [ObservableProperty] private double _windowWidth = 1200;
+    [ObservableProperty] private double _windowLeft = 0;
+    [ObservableProperty] private double _windowTop = 0;
+    [ObservableProperty] private WindowState _windowState;
     
     //Player statements
     [ObservableProperty] private MediaPlayer? _mediaPlayer;
@@ -71,7 +76,6 @@ public partial class MainViewModel : ObservableObject
         MediaPlayer.EnableHardwareDecoding = true;
         InitializePlayer(MediaPlayer);
         LoadSettings();
-        //OnVolumeChanged(Volume);
     }
 
     public void InitializePlayer(MediaPlayer mediaPlayer)
@@ -229,6 +233,18 @@ public partial class MainViewModel : ObservableObject
         {
             if (Directory.Exists(settings.LastFolderPath))
             {
+                if (settings.WindowWidth > 0 && settings.WindowHeight > 0)
+                {
+                    WindowWidth = Math.Max(800, Math.Min(settings.WindowWidth, SystemParameters.VirtualScreenWidth));
+                    WindowHeight = Math.Max(600, Math.Min(settings.WindowHeight, SystemParameters.VirtualScreenHeight));
+                }
+
+                if (settings.WindowLeft >= 0 && settings.WindowLeft < SystemParameters.VirtualScreenWidth) WindowLeft = settings.WindowLeft;
+
+                if (settings.WindowTop >= 0 && settings.WindowTop < SystemParameters.VirtualScreenHeight) WindowTop = settings.WindowTop;
+
+                if (settings.IsMaximized) this.WindowState = WindowState.Maximized;
+
                 _fileService.SelectedFolderPath = settings.LastFolderPath;
                 FolderPath = settings.LastFolderPath;
                 _fileService.RefreshFiles();
@@ -249,7 +265,12 @@ public partial class MainViewModel : ObservableObject
         {
             LastFolderPath = _fileService.SelectedFolderPath,
             Volume = Volume,
-            IsMuted = IsMuted
+            IsMuted = IsMuted,
+            WindowHeight = WindowHeight,
+            WindowWidth = WindowWidth,
+            WindowLeft = WindowLeft,
+            WindowTop = WindowTop,
+            IsMaximized = this.WindowState == WindowState.Maximized
         };
         _settingsService.SaveSettings(settings);
     }
