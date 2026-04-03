@@ -260,7 +260,7 @@
                     </Grid>
 
                     <Button Grid.Row="5" Content="⬇ Скачать в папку" Height="35" FontSize="14"
-                            FontWeight="Bold" Command="{Binding DownloadCommand}" />
+                            FontWeight="Bold" Command="{Binding DownloadCommand}" IsEnabled="{Binding HasQualityOptions}"/>
 
                     <!-- Прогресс бар и статус -->
                     <ProgressBar Grid.Row="6" x:Name="DownloadProgress" Height="10" Margin="0,15,0,5" Minimum="0"
