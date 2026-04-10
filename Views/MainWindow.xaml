@@ -15,19 +15,7 @@
 
     <Window.Resources>
         <!-- Стили для кнопок (Modern Dark Style) -->
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#333333" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="10,5" />
-            <Setter Property="Margin" Value="5" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#007ACC" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        
 
         <!-- Стили для TextBox -->
         <Style TargetType="TextBox">
@@ -260,7 +248,8 @@
                     </Grid>
 
                     <Button Grid.Row="5" Content="⬇ Скачать в папку" Height="35" FontSize="14"
-                            FontWeight="Bold" Command="{Binding DownloadCommand}" IsEnabled="{Binding HasQualityOptions}"/>
+                            FontWeight="Bold" Command="{Binding DownloadCommand}"
+                            IsEnabled="{Binding HasQualityOptions}"/>
 
                     <!-- Прогресс бар и статус -->
                     <ProgressBar Grid.Row="6" x:Name="DownloadProgress" Height="10" Margin="0,15,0,5" Minimum="0"
