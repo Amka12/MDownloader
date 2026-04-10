@@ -161,12 +161,12 @@
                                 <Button
                                     Content="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseIconConverter}}"
                                     Command="{Binding TogglePlayPauseCommand}"
-                                    Style="{StaticResource MediaButton}" />
+                                    Width="45" Height="45" FontSize="18"/>
 
                                 <!-- Stop -->
                                 <Button Content="⏹"
                                         Command="{Binding StopCommand}"
-                                        Style="{StaticResource MediaButton}" />
+                                        Width="45" Height="45" FontSize="18"/>
 
                                 <!-- Разделитель -->
                                 <Rectangle Width="1" Fill="#555" Margin="15,5" />
@@ -178,23 +178,7 @@
                                         IsChecked="{Binding IsMuted}"
                                         Width="35" Height="35"
                                         FontSize="14"
-                                        Background="#333"
-                                        Foreground="White"
-                                        Cursor="Hand"
                                         Margin="0,0,5,0">
-                                        <ToggleButton.Style>
-                                            <Style TargetType="ToggleButton">
-                                                <Setter Property="Background" Value="#333333" />
-                                                <Setter Property="Foreground" Value="White" />
-                                                <Setter Property="BorderThickness" Value="0" />
-                                                <Setter Property="Cursor" Value="Hand" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" Value="#007ACC" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ToggleButton.Style>
                                     </ToggleButton>
 
                                     <Slider Width="100"

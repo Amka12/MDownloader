@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/Button.xaml" />
+                <ResourceDictionary Source="/Styles/ToggleButton.xaml" />
                 <ResourceDictionary Source="/Styles/Slider.xaml" />
                 <ResourceDictionary Source="/Styles/ComboBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
