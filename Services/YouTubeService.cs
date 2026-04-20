@@ -34,11 +34,12 @@ public class YouTubeService : IYouTubeService
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(video.Id, ct);
 
             // Для 720p+ скачиваем видео и аудио отдельно
-            var needsMerge = quality is "1080p" or "1440p" or "2160p";
+            //var needsMerge = quality is "1080p" or "1440p" or "2160p";
 
-            if (needsMerge) return await DownloadWithMergeAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
+            //if (needsMerge) return await DownloadWithMergeAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
+            return await DownloadWithMergeAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
 
-            return await DownloadCombinedAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
+            //return await DownloadCombinedAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
         }
         catch (Exception ex)
         {
@@ -82,6 +83,9 @@ public class YouTubeService : IYouTubeService
         // Выбираем видеопоток нужного качества
         var videoStream = quality switch
         {
+            "720p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 720),
+            "480p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 480),
+            "360p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 360),
             "1080p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 1080),
             "1440p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 1440),
             "2160p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 2160),
@@ -138,6 +142,7 @@ public class YouTubeService : IYouTubeService
         var streamInfo = quality switch
         {
             "720p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 720),
+            "480p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 480),
             "360p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 360),
             "Audio Only" => streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate(),
             _ => streamManifest.GetVideoStreams().GetWithHighestVideoQuality()
