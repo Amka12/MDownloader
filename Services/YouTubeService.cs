@@ -33,10 +33,8 @@ public class YouTubeService : IYouTubeService
             var video = await youtube.Videos.GetAsync(url, ct);
             var streamManifest = await youtube.Videos.Streams.GetManifestAsync(video.Id, ct);
 
-            // Для 720p+ скачиваем видео и аудио отдельно
-            //var needsMerge = quality is "1080p" or "1440p" or "2160p";
+            if (quality is "Audio only") return await DownloadAudioAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
 
-            //if (needsMerge) return await DownloadWithMergeAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
             return await DownloadWithMergeAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
 
             //return await DownloadCombinedAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
@@ -76,6 +74,26 @@ public class YouTubeService : IYouTubeService
         {
             return new List<string> { "1080p", "720p", "360p", "Audio only" };
         }
+    }
+
+    private async Task<DownloadResult> DownloadAudioAsync(YoutubeClient youtube, Video video, StreamManifest streamManifest, string quality, string savePath, IProgress<double>? progress, CancellationToken ct)
+    {
+        var streamInfo = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
+
+        if (streamInfo == null)
+            return new DownloadResult { Success = false, Error = "Не удалось найти поток нужного качества" };
+
+        var fileName = $"{SanitizeFilename(video.Title)}.{streamInfo.Container}";
+        var fullPath = Path.Combine(savePath, fileName);
+        var counter = 1;
+        while (File.Exists(fullPath))
+        {
+            fullPath = Path.Combine(savePath, $"{video.Title}_{counter}.{streamInfo.Container}");
+            counter++;
+        }
+
+        await youtube.Videos.Streams.DownloadAsync(streamInfo, fullPath, progress, ct);
+        return new DownloadResult { Success = true, FilePath = fullPath };
     }
 
     private async Task<DownloadResult> DownloadWithMergeAsync(YoutubeClient youtube, Video video, StreamManifest streamManifest, string quality, string savePath, IProgress<double>? progress, CancellationToken ct)
@@ -135,33 +153,6 @@ public class YouTubeService : IYouTubeService
         }
 
         return new DownloadResult { Success = true, FilePath = finalPath };
-    }
-
-    private async Task<DownloadResult> DownloadCombinedAsync(YoutubeClient youtube, Video video, StreamManifest streamManifest, string quality, string savePath, IProgress<double>? progress, CancellationToken ct)
-    {
-        var streamInfo = quality switch
-        {
-            "720p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 720),
-            "480p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 480),
-            "360p" => streamManifest.GetVideoStreams().FirstOrDefault(s => s.VideoResolution.Height == 360),
-            "Audio Only" => streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate(),
-            _ => streamManifest.GetVideoStreams().GetWithHighestVideoQuality()
-        };
-
-        if (streamInfo == null)
-            return new DownloadResult { Success = false, Error = "Не удалось найти поток нужного качества" };
-
-        var fileName = $"{SanitizeFilename(video.Title)}.{streamInfo.Container}";
-        var fullPath = Path.Combine(savePath, fileName);
-        var counter = 1;
-        while (File.Exists(fullPath))
-        {
-            fullPath = Path.Combine(savePath, $"{video.Title}_{counter}.{streamInfo.Container}");
-            counter++;
-        }
-
-        await youtube.Videos.Streams.DownloadAsync(streamInfo, fullPath, progress, ct);
-        return new DownloadResult { Success = true, FilePath = fullPath };
     }
 
     private static string SanitizeFilename(string filename)
