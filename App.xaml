@@ -4,13 +4,14 @@
              xmlns:converters="clr-namespace:MDownloader.Converters">
 
     <Application.Resources>
-
         <ResourceDictionary>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Styles/Button.xaml" />
                 <ResourceDictionary Source="/Styles/ToggleButton.xaml" />
                 <ResourceDictionary Source="/Styles/Slider.xaml" />
                 <ResourceDictionary Source="/Styles/ComboBox.xaml" />
+                <ResourceDictionary Source="/Styles/TextBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
        
         <converters:BoolToPlayPauseIconConverter x:Key="BoolToPlayPauseIconConverter" />

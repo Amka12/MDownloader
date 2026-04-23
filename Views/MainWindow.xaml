@@ -4,6 +4,8 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:wpf="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
         Title="Качалка мочалка :)"
+        WindowStyle="None"
+        AllowsTransparency="True"
         Height="{Binding WindowHeight, Mode=TwoWay}"
         Width="{Binding WindowWidth,Mode=TwoWay}"
         Left="{Binding WindowLeft,Mode=TwoWay}"
@@ -12,20 +14,6 @@
         Background="#1E1E1E"
         Foreground="White"
         FontFamily="Segoe UI">
-
-    <Window.Resources>
-        <!-- Стили для кнопок (Modern Dark Style) -->
-        
-
-        <!-- Стили для TextBox -->
-        <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#2D2D2D" />
-            <Setter Property="Foreground" Value="White" />
-            <Setter Property="BorderBrush" Value="#555555" />
-            <Setter Property="Padding" Value="5" />
-            <Setter Property="Margin" Value="0,5,0,10" />
-        </Style>
-    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -38,36 +26,53 @@
         </Grid.RowDefinitions>
 
         <!-- ================= ВЕРХНЯЯ ПАНЕЛЬ ================= -->
-        <Border Padding="10">
-            <StackPanel Orientation="Horizontal" Background="#252526">
-                <TextBlock Text="КАЧАЛКА-МОЧАЛКА" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"
-                           Margin="0,0,20,0" />
-                <TextBlock Text="Текущая папка:" VerticalAlignment="Center" Foreground="#AAA" />
-                <Button Command="{Binding OpenFolderCommand}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="0"
-                        Cursor="Hand"
-                        HorizontalAlignment="Left">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <TextBlock Text="{Binding FolderPath}"
-                                       Foreground="#007ACC">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Foreground" Value="#0099FF" />
-                                                <Setter Property="TextDecorations" Value="Underline" />
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-            </StackPanel>
+        <Border>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Background="#252526">
+                    <TextBlock Text="КАЧАЛКА-МОЧАЛКА" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"
+                               Margin="0,0,20,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" />
+                    <TextBlock Text="Текущая папка:" VerticalAlignment="Center" Foreground="#AAA" />
+                    <Button Command="{Binding OpenFolderCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Cursor="Hand"
+                            HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <TextBlock Text="{Binding FolderPath}"
+                                           Foreground="#007ACC">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Foreground" Value="#0099FF" />
+                                                    <Setter Property="TextDecorations" Value="Underline" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Background="#252526">
+                    <Button Style="{StaticResource WindowControlButton}" Content="_" Click="BtnMinimize_Click" />
+                    <Button Style="{StaticResource WindowControlButton}" x:Name="BtnMaximize" Click="BtnMaximize_Click">
+                        <Button.Content>
+                            <TextBlock Text="❐" />
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource CloseButton}" Content="✕" Click="BtnClose_Click" />
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- ================= ЦЕНТРАЛЬНАЯ ОБЛАСТЬ ================= -->
@@ -161,12 +166,12 @@
                                 <Button
                                     Content="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseIconConverter}}"
                                     Command="{Binding TogglePlayPauseCommand}"
-                                    Width="45" Height="45" FontSize="18"/>
+                                    Width="45" Height="45" FontSize="18" />
 
                                 <!-- Stop -->
                                 <Button Content="⏹"
                                         Command="{Binding StopCommand}"
-                                        Width="45" Height="45" FontSize="18"/>
+                                        Width="45" Height="45" FontSize="18" />
 
                                 <!-- Разделитель -->
                                 <Rectangle Width="1" Fill="#555" Margin="15,5" />
@@ -178,8 +183,7 @@
                                         IsChecked="{Binding IsMuted}"
                                         Width="35" Height="35"
                                         FontSize="14"
-                                        Margin="0,0,5,0">
-                                    </ToggleButton>
+                                        Margin="0,0,5,0" />
 
                                     <Slider Width="100"
                                             Minimum="0"
@@ -233,7 +237,7 @@
 
                     <Button Grid.Row="5" Content="⬇ Скачать в папку" Height="35" FontSize="14"
                             FontWeight="Bold" Command="{Binding DownloadCommand}"
-                            IsEnabled="{Binding HasQualityOptions}"/>
+                            IsEnabled="{Binding HasQualityOptions}" />
 
                     <!-- Прогресс бар и статус -->
                     <ProgressBar Grid.Row="6" x:Name="DownloadProgress" Height="10" Margin="0,15,0,5" Minimum="0"
