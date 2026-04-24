@@ -60,6 +60,8 @@ public partial class MainWindow : Window
         }
     }
 
+    #region MaximizedSizeFix
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);
@@ -153,4 +155,5 @@ public partial class MainWindow : Window
         public POINT ptMinTrackSize;
         public POINT ptMaxTrackSize;
     }
+    #endregion
 }

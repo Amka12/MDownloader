@@ -51,6 +51,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private double _windowLeft = 0;
     [ObservableProperty] private double _windowTop = 0;
     [ObservableProperty] private WindowState _windowState;
+    [ObservableProperty] private bool _autoPlay;
     
     //Player statements
     [ObservableProperty] private MediaPlayer? _mediaPlayer;
@@ -351,24 +352,6 @@ public partial class MainViewModel : ObservableObject
             CurrentVideoPath = targetFile.FullPath;
             var media = new Media(_libVlc, CurrentVideoPath);
 
-            await media.Parse();
-            foreach (var track in media.Tracks)
-                switch (track.TrackType)
-                {
-                    case TrackType.Audio:
-                        Debug.WriteLine("Audio track");
-                        Debug.WriteLine($"{nameof(track.Data.Audio.Channels)}: {track.Data.Audio.Channels}");
-                        Debug.WriteLine($"{nameof(track.Data.Audio.Rate)}: {track.Data.Audio.Rate}");
-                        break;
-                    case TrackType.Video:
-                        Debug.WriteLine("Video track");
-                        Debug.WriteLine($"{nameof(track.Data.Video.FrameRateNum)}: {track.Data.Video.FrameRateNum}");
-                        Debug.WriteLine($"{nameof(track.Data.Video.FrameRateDen)}: {track.Data.Video.FrameRateDen}");
-                        Debug.WriteLine($"{nameof(track.Data.Video.Height)}: {track.Data.Video.Height}");
-                        Debug.WriteLine($"{nameof(track.Data.Video.Width)}: {track.Data.Video.Width}");
-                        break;
-                }
-
             MediaPlayer.Media = media;
             MediaPlayer.Play();
         }
@@ -447,6 +430,13 @@ public partial class MainViewModel : ObservableObject
             DownloadStatus = "Загрузка завершена!";
             _fileService.RefreshFiles();
             YoutubeUrl = string.Empty;
+
+            if (AutoPlay)
+            {
+                SelectedVideo = VideoFiles.FirstOrDefault(v => v.FullPath == result.FilePath);
+                
+                PlayVideo(SelectedVideo);
+            }
         }
         else
         {

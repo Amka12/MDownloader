@@ -36,8 +36,6 @@ public class YouTubeService : IYouTubeService
             if (quality is "Audio only") return await DownloadAudioAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
 
             return await DownloadWithMergeAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
-
-            //return await DownloadCombinedAsync(youtube, video, streamManifest, quality, savePath, progress, ct);
         }
         catch (Exception ex)
         {
