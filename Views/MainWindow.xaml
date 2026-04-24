@@ -35,7 +35,7 @@
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Background="#252526">
                     <TextBlock Text="КАЧАЛКА-МОЧАЛКА" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"
-                               Margin="0,0,20,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" />
+                               Margin="10,0,20,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" />
                     <TextBlock Text="Текущая папка:" VerticalAlignment="Center" Foreground="#AAA" />
                     <Button Command="{Binding OpenFolderCommand}"
                             Background="Transparent"
