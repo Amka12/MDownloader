@@ -1,0 +1,87 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="ListView">
+        <Setter Property="Background" Value="#1E1E1E" />
+        <Setter Property="Foreground" Value="LightGray" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style TargetType="ListViewItem">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Padding" Value="8,5" />
+        <Setter Property="Margin" Value="2,1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+
+                    <Border x:Name="Bd"
+                            Padding="{TemplateBinding Padding}"
+                            Margin="{TemplateBinding Margin}"
+                            CornerRadius="3"
+                            BorderBrush="Transparent"
+                            BorderThickness="0">
+
+                        <Border.Background>
+                            <SolidColorBrush x:Name="BgBrush" Color="Transparent" />
+                        </Border.Background>
+
+                        <GridViewRowPresenter
+                            Content="{TemplateBinding Content}"
+                            Columns="{TemplateBinding GridView.ColumnCollection}" />
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+
+                        <!--Hover-->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="Background" Value="#2D2D30" />
+                        </MultiTrigger>
+
+                        <!--Selected-->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="SelectOn">
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="BgBrush"
+                                            Storyboard.TargetProperty="Color"
+                                            To="#007ACC"
+                                            Duration="0:0:0.25">
+                                            <ColorAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut" />
+                                            </ColorAnimation.EasingFunction>
+                                        </ColorAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation
+                                            Storyboard.TargetName="BgBrush"
+                                            Storyboard.TargetProperty="Color"
+                                            To="Transparent"
+                                            Duration="0:0:0.25">
+                                            <ColorAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseIn" />
+                                            </ColorAnimation.EasingFunction>
+                                        </ColorAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

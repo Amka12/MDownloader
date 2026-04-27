@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="/Styles/Slider.xaml" />
                 <ResourceDictionary Source="/Styles/ComboBox.xaml" />
                 <ResourceDictionary Source="/Styles/TextBox.xaml" />
+                <ResourceDictionary Source="/Styles/ListView.xaml" />
             </ResourceDictionary.MergedDictionaries>
        
         <converters:BoolToPlayPauseIconConverter x:Key="BoolToPlayPauseIconConverter" />

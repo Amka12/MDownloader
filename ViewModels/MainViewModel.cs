@@ -344,7 +344,7 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async void PlayVideo(VideoFile? file)
+    private void PlayVideo(VideoFile? file)
     {
         var targetFile = file ?? SelectedVideo;
         if (targetFile != null && MediaPlayer != null)

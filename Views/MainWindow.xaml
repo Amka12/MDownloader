@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:wpf="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
-        xmlns:Behaviors="clr-namespace:MDownloader.Behaviors"
+        xmlns:helpers="clr-namespace:MDownloader.Helpers"
         Title="Качалка мочалка :)"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -293,10 +293,8 @@
 
                 <!-- Список файлов -->
                 <ListView x:Name="LvFileList"
+                          helpers:ListViewScrollHelper.ScrollToItem="{Binding SelectedVideo}"
                           Grid.Row="1"
-                          Background="#1E1E1E"
-                          Foreground="LightGray"
-                          BorderThickness="0"
                           SelectionMode="Single"
                           ItemsSource="{Binding VideoFiles}"
                           SelectedItem="{Binding SelectedVideo, Mode=TwoWay}">
@@ -306,55 +304,6 @@
                                                    CommandParameter="{Binding SelectedItem, ElementName=LvFileList}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                    <i:Interaction.Behaviors>
-                        <Behaviors:ScrollIntoViewForListBox />
-                    </i:Interaction.Behaviors>
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="Foreground" Value="White" />
-                            <Setter Property="Padding" Value="8,5" />
-                            <Setter Property="Margin" Value="2,1" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListViewItem">
-                                        <Border x:Name="Bd"
-                                                Background="{TemplateBinding Background}"
-                                                Padding="{TemplateBinding Padding}"
-                                                Margin="{TemplateBinding Margin}"
-                                                CornerRadius="3"
-                                                BorderBrush="Transparent"
-                                                BorderThickness="0">
-                                            <GridViewRowPresenter
-                                                Content="{TemplateBinding Content}"
-                                                Columns="{TemplateBinding GridView.ColumnCollection}" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#007ACC" />
-                                                <Setter Property="Foreground" Value="White" />
-                                            </Trigger>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="#2D2D30" />
-                                            </Trigger>
-                                             <!--Анимация при выделении--> 
-                                            <EventTrigger RoutedEvent="Selected">
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <ColorAnimation
-                                                            Storyboard.TargetName="Bd"
-                                                            Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
-                                                            To="#007ACC"
-                                                            Duration="0:0:0.2" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Имя файла" Width="500" DisplayMemberBinding="{Binding Name}" />
