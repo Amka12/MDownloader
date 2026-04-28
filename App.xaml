@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="/Styles/ComboBox.xaml" />
                 <ResourceDictionary Source="/Styles/TextBox.xaml" />
                 <ResourceDictionary Source="/Styles/ListView.xaml" />
+                <ResourceDictionary Source="/Styles/CheckBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
        
         <converters:BoolToPlayPauseIconConverter x:Key="BoolToPlayPauseIconConverter" />
